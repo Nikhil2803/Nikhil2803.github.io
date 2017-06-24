@@ -1,1 +1,0 @@
-java $JAVA_OPTS -jar WEB-INF/lib/webapp-runner-7.0.22.1.jar  --port $PORT *.war 
