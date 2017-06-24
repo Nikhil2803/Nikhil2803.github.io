@@ -1,1 +1,1 @@
-java  -jar lib/webapp-runner-7.0.22.1.jar  *.war 
+web: java $JAVA_OPTS -jar lib/webapp-runner-7.0.22.1.jar  --port $PORT *.war 
