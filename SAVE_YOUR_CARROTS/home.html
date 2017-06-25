@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<head>
+<title>Grid Pick</title>
+<style>
+.wrapper {
+  display: flex;
+}
+.wrapper > div {
+  font-size: 4vh;
+  color: white;
+  background: green;
+  margin: .1em;
+  padding: .3em;
+  border-radius: 3px;
+  flex: 1;
+}
+</style>
+<script type="text/javascript">
+
+var cellId='cell-1';
+var clickedCell='cell-1';
+var count =0;
+var score =0;
+var interval=2000;
+var timer=null;
+
+function hammerStrik(hitCellId){
+var audio = new Audio('hammer.mp3');
+audio.play();
+document.getElementById(hitCellId).style.cursor="url('hammer-hit.jpg'), auto";
+if(cellId==hitCellId){
+score++;
+document.getElementById(hitCellId).innerHTML="<img src='bunny-hit.jpg'/> ";
+if((score%2)==0){
+interval=interval-200;
+}
+}
+
+clearInterval(timer);
+timer=setInterval(shuffulPattern,interval);
+document.getElementById('score').innerHTML="<strong><p style='font-family: Stencil Std';font-size:18pt>Your score is:   "+score+"   </p></strong>";
+}
+
+function defaultHammer(hitCellId){
+document.getElementById(hitCellId).style.cursor="url('hammer.jpg'), auto";
+}
+
+function shuffulPattern(){
+count=count+1;
+var cellVal = (document.getElementById(cellId).getAttribute("value"))-1;
+var imageName=null;
+if(cellVal>=0){
+imageName='carrot'+cellVal+'.jpg';
+document.getElementById(cellId).setAttribute("value",cellVal);
+}else{
+imageName='carrot0.jpg';
+}
+document.getElementById(cellId).style.backgroundColor ='green';
+document.getElementById(cellId).innerHTML="<img src="+"'"+imageName+"'"+"/> ";
+
+var i = Math.floor(Math.random()*36);
+cellId= 'cell-'+i;
+document.getElementById(cellId).style.backgroundColor ='green';
+cellVal =((document.getElementById(cellId).getAttribute("value"))-1)
+if(cellVal>=0){
+document.getElementById(cellId).innerHTML="<img src='bunny.jpg'/>";
+}else{
+document.getElementById(cellId).innerHTML="<img src='no-carrot.jpg'/>";
+}
+
+}
+
+timer = setInterval(shuffulPattern,interval);
+</script>
+</head>
+<body oncontextmenu="return false;">
+<div id = "score" align = "center" style="float: right;padding-top:13%;" ><strong> <p style='font-family: Stencil Std';font-size:18pt>Your score is: 00   </p></strong></div>
+<div id = "bg" ><img src = "bunny-header.jpg"/></div>
+
+<hr size="3" color="black">
+<div id = "container" style="CURSOR: url('hammer.jpg')">
+<div class="wrapper">
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-1"  value="2" onmousedown="hammerStrik('cell-1')"  onmouseup="defaultHammer('cell-1')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-2"  value="2" onmousedown="hammerStrik('cell-2')"  onmouseup="defaultHammer('cell-2')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-3"  value="2" onmousedown="hammerStrik('cell-3')"  onmouseup="defaultHammer('cell-3')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-4"  value="2" onmousedown="hammerStrik('cell-4')"  onmouseup="defaultHammer('cell-4')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-5"  value="2" onmousedown="hammerStrik('cell-5')"  onmouseup="defaultHammer('cell-5')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-6"  value="2" onmousedown="hammerStrik('cell-6')"  onmouseup="defaultHammer('cell-6')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-7"  value="2" onmousedown="hammerStrik('cell-7')"  onmouseup="defaultHammer('cell-7')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-8"  value="2" onmousedown="hammerStrik('cell-8')"  onmouseup="defaultHammer('cell-8')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-9"  value="2" onmousedown="hammerStrik('cell-9')"  onmouseup="defaultHammer('cell-9')"><img src='carrot.jpg'></div>
+</div>                                                                                                           
+<div class="wrapper">                                                                                            
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-10" value="2" onmousedown="hammerStrik('cell-10')" onmouseup="defaultHammer('cell-10')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-11" value="2" onmousedown="hammerStrik('cell-11')" onmouseup="defaultHammer('cell-11')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-12" value="2" onmousedown="hammerStrik('cell-12')" onmouseup="defaultHammer('cell-12')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-13" value="2" onmousedown="hammerStrik('cell-13')" onmouseup="defaultHammer('cell-13')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-14" value="2" onmousedown="hammerStrik('cell-14')" onmouseup="defaultHammer('cell-14')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-15" value="2" onmousedown="hammerStrik('cell-15')" onmouseup="defaultHammer('cell-15')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-16" value="2" onmousedown="hammerStrik('cell-16')" onmouseup="defaultHammer('cell-16')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-17" value="2" onmousedown="hammerStrik('cell-17')" onmouseup="defaultHammer('cell-17')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-18" value="2" onmousedown="hammerStrik('cell-18')" onmouseup="defaultHammer('cell-18')"><img src='carrot.jpg'></div>
+</div>                                                                                                            
+<div class="wrapper">                                                                                           
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-19" value="2" onmousedown="hammerStrik('cell-19')" onmouseup="defaultHammer('cell-19')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-20" value="2" onmousedown="hammerStrik('cell-20')" onmouseup="defaultHammer('cell-20')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-21" value="2" onmousedown="hammerStrik('cell-21')" onmouseup="defaultHammer('cell-21')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-22" value="2" onmousedown="hammerStrik('cell-22')" onmouseup="defaultHammer('cell-22')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-23" value="2" onmousedown="hammerStrik('cell-23')" onmouseup="defaultHammer('cell-23')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-24" value="2" onmousedown="hammerStrik('cell-24')" onmouseup="defaultHammer('cell-24')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-25" value="2" onmousedown="hammerStrik('cell-25')" onmouseup="defaultHammer('cell-25')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-26" value="2" onmousedown="hammerStrik('cell-26')" onmouseup="defaultHammer('cell-26')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-27" value="2" onmousedown="hammerStrik('cell-27')" onmouseup="defaultHammer('cell-27')"><img src='carrot.jpg'></div>
+</div>                                                                                                            
+<div class="wrapper">                                                                                            
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-28" value="2" onmousedown="hammerStrik('cell-28')" onmouseup="defaultHammer('cell-28')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-29" value="2" onmousedown="hammerStrik('cell-29')" onmouseup="defaultHammer('cell-29')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-30" value="2" onmousedown="hammerStrik('cell-30')" onmouseup="defaultHammer('cell-30')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-31" value="2" onmousedown="hammerStrik('cell-31')" onmouseup="defaultHammer('cell-31')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-32" value="2" onmousedown="hammerStrik('cell-32')" onmouseup="defaultHammer('cell-32')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-33" value="2" onmousedown="hammerStrik('cell-33')" onmouseup="defaultHammer('cell-33')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-34" value="2" onmousedown="hammerStrik('cell-34')" onmouseup="defaultHammer('cell-34')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-35" value="2" onmousedown="hammerStrik('cell-35')" onmouseup="defaultHammer('cell-35')"><img src='carrot.jpg'></div>
+  <div style="CURSOR: url('hammer.jpg'), auto" id="cell-36" value="2" onmousedown="hammerStrik('cell-36')" onmouseup="defaultHammer('cell-36')"><img src='carrot.jpg'></div>
+</div>
+</div>
+<div style="CURSOR: url('hammer.jpg'), auto" id = "comments">
+</div>
+<div style="CURSOR: url('hammer.jpg'), auto" id="">
+</div>
+<br><br>
+<hr size="3" color="black">
+<div align="center"><b>Designed by : <a href="https://dynamicresume.herokuapp.com/" target="_blank">Nikhil Khatri</a></b></div>
+</body>
+</html>
