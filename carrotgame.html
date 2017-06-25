@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <head>
-<title>Grid Pick</title>
+<title>Save Your Carrot</title>
 <style>
 .wrapper {
   display: flex;
@@ -16,7 +16,8 @@
 }
 </style>
 <script type="text/javascript">
-
+var audio =new Audio('carrot_game_images/hammer.mp3');
+var toggle=0;
 var cellId='cell-1';
 var clickedCell='cell-1';
 var count =0;
@@ -25,9 +26,9 @@ var interval=2000;
 var timer=null;
 
 function hammerStrik(hitCellId){
-var audio = new Audio('hammer.mp3');
+audio.volume=0.2;
 audio.play();
-document.getElementById(hitCellId).style.cursor="url('hammer-hit.jpg'), auto";
+document.getElementById(hitCellId).style.cursor="url('carrot_game_images/hammer-hit.jpg'), auto";
 if(cellId==hitCellId){
 score++;
 document.getElementById(hitCellId).innerHTML="<img src='carrot_game_images/bunny-hit.jpg'/> ";
@@ -71,11 +72,24 @@ document.getElementById(cellId).innerHTML="<img src='carrot_game_images/no-carro
 }
 
 timer = setInterval(shuffulPattern,interval);
+
+function toggleAudio(){
+if(toggle==0){
+audio.muted=true;
+toggle=1;
+document.getElementById("audio").src="carrot_game_images/audio-off.jpg";
+}else{
+audio.muted=false;
+toggle=0;
+document.getElementById("audio").src="carrot_game_images/audio-on.jpg";
+}
+}
+
 </script>
 </head>
 <body oncontextmenu="return false;">
 <div id = "score" align = "center" style="float: right;padding-top:13%;" ><strong> <p style='font-family: Stencil Std';font-size:18pt>Your score is: 00   </p></strong></div>
-<div id = "bg" ><img src = "carrot_game_images/bunny-header.jpg"/></div>
+<div id = "bg" ><img id="audio" src="carrot_game_images/audio-on.jpg" align="left" onclick="toggleAudio()"/><img src = "carrot_game_images/bunny-header.jpg"/></div>
 
 <hr size="3" color="black">
 <div id = "container" style="CURSOR: url('carrot_game_images/hammer.jpg')">
