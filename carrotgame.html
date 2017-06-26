@@ -18,28 +18,35 @@
 <script type="text/javascript">
 var audio =new Audio('carrot_game_images/hammer.mp3');
 var toggle=0;
+var playToggle=0;
 var cellId='cell-1';
 var clickedCell='cell-1';
 var count =0;
 var score =0;
 var interval=2000;
 var timer=null;
+var hammerStrikeCount=0;
+var carrotsRemaining =69;
+var player="Bunny";
 
 function hammerStrik(hitCellId){
 audio.volume=0.2;
+if(hammerStrikeCount==0 && playToggle==1){
 audio.play();
+hammerStrikeCount=1;
 document.getElementById(hitCellId).style.cursor="url('carrot_game_images/hammer-hit.jpg'), auto";
-if(cellId==hitCellId){
-score++;
-document.getElementById(hitCellId).innerHTML="<img src='carrot_game_images/bunny-hit.jpg'/> ";
-if((score%2)==0 && interval>300){
-interval=interval-200;
-}
+	if(cellId==hitCellId){
+		score++;
+		document.getElementById(hitCellId).innerHTML="<img src='carrot_game_images/bunny-hit.jpg'/> ";
+	if((score%2)==0 && interval>300){
+		interval=interval-200;
+	}
 }
 
 clearInterval(timer);
 timer=setInterval(shuffulPattern,interval);
-document.getElementById('score').innerHTML="<strong><p style='font-family: Stencil Std';font-size:18pt>Your score is:   "+score+"   </p></strong>";
+document.getElementById('score').innerHTML="<strong><p style='font-family: Stencil Std';font-size:18pt>"+player+", Your score is: "+" "+score+"   </p></strong>";
+}
 }
 
 function defaultHammer(hitCellId){
@@ -47,49 +54,85 @@ document.getElementById(hitCellId).style.cursor="url('carrot_game_images/hammer.
 }
 
 function shuffulPattern(){
+
+	if(carrotsRemaining==0){
+		alert('Game is finished, Your score is '+score);
+		clearInterval(timer);
+	}
+
 count=count+1;
-var cellVal = (document.getElementById(cellId).getAttribute("value"))-1;
+var cellVal = 0
+
+	if(document.getElementById(cellId).getAttribute("value")!=0){
+		cellVal= document.getElementById(cellId).getAttribute("value")-1;
+	}
+
 var imageName=null;
-if(cellVal>=0){
-imageName='carrot'+cellVal+'.jpg';
-document.getElementById(cellId).setAttribute("value",cellVal);
-}else{
-imageName='carrot0.jpg';
-}
+hammerStrikeCount=0;
+	if(cellVal>0){
+		imageName='carrot'+cellVal+'.jpg';
+		document.getElementById(cellId).setAttribute("value",cellVal);
+		document.getElementById(cellId).innerHTML="<img src='carrot_game_images/"+imageName+"'"+"/> ";
+	}else{
+		document.getElementById(cellId).setAttribute("value",0);
+		document.getElementById(cellId).innerHTML=""+cellVal;
+	}
 document.getElementById(cellId).style.backgroundColor ='green';
-document.getElementById(cellId).innerHTML="<img src='carrot_game_images/"+imageName+"'"+"/> ";
 
-var i = Math.floor(Math.random()*36);
-cellId= 'cell-'+i;
-document.getElementById(cellId).style.backgroundColor ='green';
-cellVal =((document.getElementById(cellId).getAttribute("value"))-1)
-if(cellVal>=0){
-document.getElementById(cellId).innerHTML="<img src='carrot_game_images/bunny.jpg'/>";
-}else{
-document.getElementById(cellId).innerHTML="<img src='carrot_game_images/no-carrot.jpg'/>";
+
+var i = Math.floor(Math.random()*37);
+if(i!=0){
+		cellId= 'cell-'+i;
+		document.getElementById(cellId).style.backgroundColor ='green';
+		cellVal =((document.getElementById(cellId).getAttribute("value"))-1);
+		if(cellVal>=0){
+			document.getElementById(cellId).innerHTML="<img src='carrot_game_images/bunny.jpg'/>";
+			carrotsRemaining=carrotsRemaining-1;
+		}else{
+			document.getElementById(cellId).innerHTML="<img src='carrot_game_images/no-carrot.jpg'/>";
+		}
+	}
 }
-
-}
-
-timer = setInterval(shuffulPattern,interval);
 
 function toggleAudio(){
-if(toggle==0){
-audio.muted=true;
-toggle=1;
-document.getElementById("audio").src="carrot_game_images/audio-off.jpg";
-}else{
-audio.muted=false;
-toggle=0;
-document.getElementById("audio").src="carrot_game_images/audio-on.jpg";
+	if(toggle==0){
+		audio.muted=true;
+		toggle=1;
+		document.getElementById("audio").src="carrot_game_images/audio-off.jpg";
+	}else{
+		audio.muted=false;
+		toggle=0;
+		document.getElementById("audio").src="carrot_game_images/audio-on.jpg";
+	}
 }
+
+function togglePlay(){
+	if(playToggle==0){
+		playToggle=1;
+		timer = setInterval(shuffulPattern,interval);
+		document.getElementById("play").src="carrot_game_images/pause_button.jpg";
+	}else{
+		playToggle=0;
+		clearInterval(timer);
+		document.getElementById("play").src="carrot_game_images/play_button.jpg";
+	}
 }
+
+function welcomeToGame(){
+player=prompt('Please enter your name in capital');
+alert("Welcome !!"+player+".\nTo the game of quickness. We are a team of Bugs Bunnies :)"
+		+"\nWe will try to eat all your carrots and you have to catch us."
+		+"\nLets see how many of us you can catch by hitting hammer."
+		+"\nThere is one condition that you can hit only once anywhere in the field every time one of us appears"
+		+"\n So lets begin. Beware WE GETS QUICKER & QUICKER :)");
+}
+
 
 </script>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="return false;" onload="welcomeToGame()">
 <div id = "score" align = "center" style="float: right;padding-top:13%;" ><strong> <p style='font-family: Stencil Std';font-size:18pt>Your score is: 00   </p></strong></div>
-<div id = "bg" ><img id="audio" src="carrot_game_images/audio-on.jpg" align="left" onclick="toggleAudio()"/><img src = "carrot_game_images/bunny-header.jpg"/></div>
+<div id = "bg"><img id="play" style="padding-top:13%;" src="carrot_game_images/play_button.jpg" align="left" onclick="togglePlay()"/><img id="audio" style="padding-top:13%;" src="carrot_game_images/audio-on.jpg" align="left" onclick="toggleAudio()"/><img src = "carrot_game_images/bunny-header.jpg"/></div>
 
 <hr size="3" color="black">
 <div id = "container" style="CURSOR: url('carrot_game_images/hammer.jpg')">
