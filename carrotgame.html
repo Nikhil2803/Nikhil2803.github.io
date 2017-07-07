@@ -28,10 +28,11 @@ var timer=null;
 var hammerStrikeCount=0;
 var carrotsRemaining =69;
 var player="Bunny";
+var isFinished=false;
 
 function hammerStrik(hitCellId){
 audio.volume=0.2;
-if(hammerStrikeCount==0 && playToggle==1){
+if(hammerStrikeCount==0 && playToggle==1 && !isFinished){
 audio.play();
 hammerStrikeCount=1;
 document.getElementById(hitCellId).style.cursor="url('carrot_game_images/hammer-hit.jpg'), auto";
@@ -39,13 +40,13 @@ document.getElementById(hitCellId).style.cursor="url('carrot_game_images/hammer-
 		score++;
 		document.getElementById(hitCellId).innerHTML="<img src='carrot_game_images/bunny-hit.jpg'/> ";
 	if((score%2)==0 && interval>300){
-		interval=interval-200;
+		interval=interval-150;
 	}
 }
 
 clearInterval(timer);
 timer=setInterval(shuffulPattern,interval);
-document.getElementById('score').innerHTML="<strong><p style='font-family: Stencil Std';font-size:18pt>"+player+", Your score is: "+" "+score+"   </p></strong>";
+document.getElementById('score').innerHTML="<strong style='font-family: Stencil Std';font-size:18pt>"+player+", Your score is: "+" "+score+" </strong>";
 }
 }
 
@@ -58,6 +59,7 @@ function shuffulPattern(){
 	if(carrotsRemaining==0){
 		alert('Game is finished, Your score is '+score);
 		clearInterval(timer);
+		isFinished=true;
 	}
 
 count=count+1;
@@ -75,7 +77,7 @@ hammerStrikeCount=0;
 		document.getElementById(cellId).innerHTML="<img src='carrot_game_images/"+imageName+"'"+"/> ";
 	}else{
 		document.getElementById(cellId).setAttribute("value",0);
-		document.getElementById(cellId).innerHTML=""+cellVal;
+		document.getElementById(cellId).innerHTML="<img src='carrot_game_images/carrot0.jpg'/> ";
 	}
 document.getElementById(cellId).style.backgroundColor ='green';
 
