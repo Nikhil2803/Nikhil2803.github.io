@@ -1,0 +1,518 @@
+
+<!-- saved from url=(0056)file:///N:/Programming/TaxCalculator/tax_calculator.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Tax Calculator by Nikhil Khatri</title>
+<link rel="shortcut icon" href="file:///N:/Programming/TaxCalculator/nikarts_icon.ico" type="image/x-icon">
+ <link rel="stylesheet" type="text/css" href="file:///N:/Programming/TaxCalculator/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="file:///N:/Programming/TaxCalculator/Main.css">
+  <script type="text/javascript" src="file:///N:/Programming/TaxCalculator/tax_slabs_jsons.js"></script>
+  
+  <script type="text/javascript">
+	var sec10Display = 1;
+	var sec80Display = 1;
+	var secIncomesDisplay = 1;
+	var taxRelief87A=2500;
+	var limit80C = 150000;
+	var limit80E = 150000;
+	var limit80T = 10000;
+	var limit80DMax = 100000;
+	var year202021Relief = 500000;
+	var totalTax = 0;
+	var surcharge=0;
+	var educationCess=0;
+	var totalIncome=0;
+	var deductions = 0;
+	var taxableIncome=0;
+
+	var taxSlabs=taxSlabs201920;
+	var assesYear ='201920';
+	
+	function selectTaxSlab(){
+		assesYear = document.getElementById('assesYear').value;
+		taxSlabs = window['taxSlabs'+assesYear];
+	}
+	function checkAndPopulate0(elem){
+		if(elem.value == null || elem.value.trim() == ""){
+			elem.value = 0;
+		}
+		elem.style.background="#ffffff";
+	}
+	
+	function checkAndRemove0(elem){
+		if(elem.value == 0){
+			elem.value = "";
+		}
+		elem.style.background="#ffff99";
+	}
+	function alterSec10(){
+		if(sec10Display){
+			document.getElementById('sec10').style.display='block';
+			document.getElementById('sec10Img').src='collapse.png';
+			sec10Display=0;
+		}else{
+			document.getElementById('sec10').style.display='none';
+			document.getElementById('sec10Img').src='expand.png';
+			sec10Display=1;
+		}
+	}
+	
+		function alterSec80(){
+		if(sec80Display){
+			document.getElementById('sec80').style.display='block';
+			document.getElementById('sec80Img').src='collapse.png';
+			sec80Display=0;
+		}else{
+			document.getElementById('sec80').style.display='none';
+			document.getElementById('sec80Img').src='expand.png';
+			sec80Display=1;
+		}
+	}
+	
+	function alterSecIncomes(){
+		if(secIncomesDisplay){
+			document.getElementById('secIncomes').style.display='block';
+			document.getElementById('secIncomesImg').src='collapse.png';
+			secIncomesDisplay=0;
+		}else{
+			document.getElementById('secIncomes').style.display='none';
+			document.getElementById('secIncomesImg').src='expand.png';
+			secIncomesDisplay=1;
+		}
+	}
+	
+	
+	function updateDeductions(){
+	deductions = parseInt(document.getElementById('sec10Deds').value)
+					+ parseInt(document.getElementById('sec80CDeds').value)
+					+parseInt(document.getElementById('sec80DDeds').value)
+					+parseInt(document.getElementById('sec80EDeds').value)
+					+parseInt(document.getElementById('sec80GDeds').value)
+					+parseInt(document.getElementById('sec80TDeds').value);
+					
+	
+					updateTotalIncome();
+	}
+	
+	function updateTotalIncome(){
+		totalIncome = parseInt(document.getElementById('grossSalary').value)
+					+ parseInt(document.getElementById('interestIncome').value)
+					+parseInt(document.getElementById('rentalIncome').value)
+					+parseInt(document.getElementById('agroIncome').value);
+		taxableIncome = totalIncome-deductions;
+		document.getElementById('totalIncome').value = totalIncome;
+		document.getElementById('netTaxableIncome').value = taxableIncome;
+		calculateTax();
+	}
+	
+	function filledTotalIncome(){
+		totalIncome = parseInt(document.getElementById('totalIncome').value);
+		taxableIncome = totalIncome-deductions;
+		document.getElementById('totalIncome').value = totalIncome;
+		document.getElementById('netTaxableIncome').value = taxableIncome;
+		calculateTax();
+	}
+	
+	function calculateTax(){
+		var itemSeq=0;
+		var indvType = document.getElementById('indvType').value;
+		var netTaxableIncome = document.getElementById('netTaxableIncome').value;
+		totalTax=0;
+		surcharge=0;
+		if(assesYear !='202021' || totalIncome>year202021Relief){
+		
+			if(indvType==null && indvType==''){
+				indvType="Men";
+			}
+			var taxRateJsons = taxSlabs[indvType].incomeTaxRate;
+			var lastRange=0;
+			for(var range in taxRateJsons){
+			
+				var incRange = parseInt(range);
+				if(itemSeq==0 && netTaxableIncome <incRange){
+					break;
+				}
+				
+				if(netTaxableIncome>0){
+					if((netTaxableIncome - (incRange-lastRange))>0)
+						totalTax = totalTax + ((incRange-lastRange)*(taxRateJsons[range])/100);
+					else
+						totalTax = totalTax + ((netTaxableIncome)*(taxRateJsons[range])/100);
+					
+					netTaxableIncome = netTaxableIncome - (incRange-lastRange);
+					lastRange=incRange;
+				}
+				++itemSeq;
+			}
+			
+			//Relief 87A
+			if(totalIncome>0 && totalIncome<=350000){
+				totalTax=totalTax-taxRelief87A;
+				if(totalTax<0){
+					totalTax=0;
+				}
+			}
+			
+			lastRange=0;
+			itemSeq=0;
+			var netTax = totalTax;
+			netTaxableIncome = document.getElementById('netTaxableIncome').value;
+			var surchargeJsons = taxSlabs[indvType].surcharge;
+			for(var range in surchargeJsons){
+				var incRange = parseInt(range);
+				if(itemSeq==0 && netTaxableIncome <incRange){
+					break;
+				}
+				
+				if(netTax>0){
+					
+					if(range<=netTaxableIncome ){
+						surcharge = surcharge + ((netTax)*(surchargeJsons[range])/100);
+					}
+					netTaxableIncome = netTaxableIncome - (incRange-lastRange);
+					lastRange=incRange;
+				}
+				itemSeq++;
+			}
+		}	
+			
+			educationCess = totalTax * ((taxSlabs[indvType].EducationCess)/100);
+			document.getElementById('totalTax').value=totalTax;
+			document.getElementById('cess').value=educationCess;
+			document.getElementById('surcharge').value=surcharge;
+			updateTaxLaibility();
+	} 
+	
+	function updateTaxLaibility(){
+		document.getElementById('taxLiability').value=(totalTax+educationCess+surcharge);
+	}
+	
+	function printMsg(elemId, value){
+		document.getElementById(elemId).innerHTML=value;
+		document.getElementById(elemId).style.color='green';
+	}
+	
+	function printError(elemId, value){
+		document.getElementById(elemId).innerHTML=value;
+		document.getElementById(elemId).style.color='red';
+	}
+	
+	function clearError(elemId){
+		document.getElementById(elemId).innerHTML='';
+	}
+	
+	function validateIncomesDeductions(){
+	var grossSalary= parseInt(document.getElementById('grossSalary').value);
+	var interestIncome= parseInt(document.getElementById('interestIncome').value);
+	var rentalIncome= parseInt(document.getElementById('rentalIncome').value);
+	var agroIncome= parseInt(document.getElementById('agroIncome').value);
+	
+	var sec10Deds = parseInt(document.getElementById('sec10Deds').value);
+	var sec80CDeds =  parseInt(document.getElementById('sec80CDeds').value);
+	var sec80DDeds = parseInt(document.getElementById('sec80DDeds').value);
+	var sec80EDeds = parseInt(document.getElementById('sec80EDeds').value);
+	var sec80GDeds = parseInt(document.getElementById('sec80GDeds').value);
+	var sec80TDeds = parseInt(document.getElementById('sec80TDeds').value);
+	
+		if(interestIncome>0){
+			printMsg('interestIncomeMsg','Upto'+limit80T+'/- of Interest income[earned from Savings account] could be claimed in 80TTA');
+		}
+		if(sec10Deds>grossSalary){
+			printError('sec10DedsMsg','Section 10 Deductions could not be greater than Gross salary');
+			return false;
+		}
+		if(sec80CDeds>limit80C){
+			printError('sec80CDedsMsg','Total Deductions under 80C could not be more than -'+limit80C);
+			return false;
+		}
+		if(sec80DDeds>limit80DMax){
+			printError('sec80DDedsMsg','Total Deductions under 80D could not be more than -'+limit80DMax);
+			return false;
+		}
+		if(sec80EDeds>limit80E){
+			printError('sec80EDedsMsg','Total Deductions under 80E could not be more than -'+limit80E);
+			return false;
+		}
+		if(sec80TDeds>0 && interestIncome<=0){
+			printError('sec80TDedsMsg','Deductions under 80 TTA is only applicable if there is any Interest incomes[Interest from saving accounts]');
+			return false;
+		}
+		if(sec80TDeds>limit80T){
+			printError('sec80TDedsMsg','Total Deductions under 80TTA could not be more than -'+limit80T);
+			return false;
+		}
+		if(sec80TDeds>interestIncome){
+			printError('sec80TDedsMsg','Deductions under 80 TTA could not be greater than Interest Income');
+			return false;
+		}
+		
+		clearError('sec10DedsMsg');
+		clearError('sec80CDedsMsg');
+		clearError('sec80DDedsMsg');
+		clearError('sec80EDedsMsg');
+		clearError('sec80TDedsMsg');
+	return true;
+		
+	}
+  </script>
+</head>
+
+<body>
+<div class="container center-box-div" align="center">
+<h5 align="left">Income Tax Calculator</h5>
+<div class="col-sm-12" align="center">
+	<br>
+	<h6 align="left">Basic Details</h6>
+	<table class="container w3table-1" caption="Basic Details">
+		<tbody><tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label"> Tax Payer</label>
+			</td>
+			<td>
+				<div class="col-sm-3 col-xs-12">
+					<label class="col-sm-9 col-xs-12 control-label"> Individual</label>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Assesment Year</label>
+			</td>
+			<td>
+				<div class="col-sm-3 col-xs-12">
+					<select class="wdth200" id="assesYear" onchange="selectTaxSlab();calculateTax();">
+						<option value="201920">Select</option>
+						<option value="202021">2020-21</option>
+						<option value="201920">2019-20</option>
+						<option value="201819">2018-19</option>
+						<option value="201718">2017-18</option>
+						<option value="201617">2016-17</option>
+					</select>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Male / Female / Senior Citizen</label>
+			</td>
+			<td>
+				<div class="col-sm-3 col-xs-12">
+					<select class="wdth200" id="indvType">
+						<option value="Men">Select</option>
+						<option value="Men">Male</option>
+						<option value="Women">Female</option>
+						<option value="SeniorCitizen">Senior Citizen (60 to 80 Years)</option>
+						<option value="SuperSeniorCitizen">Super Senior Citizen (Above 80 Years)</option>
+					</select>
+				</div>
+			</td>
+		</tr>
+	</tbody></table>
+	
+		<br>
+	<h6 align="left">
+	<input type="image" src="file:///N:/Programming/TaxCalculator/expand.png" id="secIncomesImg" alt="Collapse" width="15" height="15" onclick="alterSecIncomes();">
+	
+	Incomes
+	
+	</h6>
+	<div id="secIncomes" style="display: none;">
+	<table class="container w3table-1" caption="Income">
+		
+		<tbody><tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Gross Salary</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="grossSalary" type="text" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateTotalIncome()" onfocus="checkAndRemove0(this)" onblur="checkAndPopulate0(this)">
+				<p id="grossSalaryMsg"></p>
+			</td>
+				
+		</tr>
+		
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Income from Interest</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="interestIncome" type="text" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateTotalIncome();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+				<p id="interestIncomeMsg"></p>
+			</td>
+				
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Rental Income Received</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="rentalIncome" type="text" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateTotalIncome();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+				<p id="rentalIncomeMsg"></p>
+			</td>
+				
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Income from Agriculture</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="agroIncome" type="text" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateTotalIncome();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+				<p id="agroIncomeMsg"></p>
+			</td>
+				
+		</tr>
+		
+			<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Total Income</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="totalIncome" type="text" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())filledTotalIncome();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+				<p id="agroIncomeMsg"></p>
+			</td>
+				
+		</tr>
+		
+	</tbody></table>
+	</div>
+	
+	<br>
+	
+	<h6 align="left" onclick="alterSec10();&gt;
+		&lt;caption style=" align:left"="">
+			<input type="image" src="file:///N:/Programming/TaxCalculator/expand.png" alt="Expand" id="sec10Img" width="15" height="15" onclick="alterSec10();">
+			Deductions Under Section 10
+		
+	</h6>
+	<div id="sec10" style="display: none;">
+		<table class="container w3table-1" caption="Income">
+			<tbody><tr>
+				<td>
+					<label class="col-sm-9 col-xs-12 control-label">HRA, LTA, Standard Decuctions, Professional Tax etc.</label>
+				</td>
+				<td align="center">
+					<input class="wdth270" type="text" id="sec10Deds" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateDeductions();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+					<p id="sec10DedsMsg"></p>
+				</td>
+					
+			</tr>
+		</tbody></table>
+	</div>
+	
+	<br>
+	
+	<h6 align="left">
+	<input type="image" src="file:///N:/Programming/TaxCalculator/expand.png" id="sec80Img" alt="Collapse" width="15" height="15" onclick="alterSec80();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);" value="0" style="background: rgb(255, 255, 255);">
+	Deductions Under Section 80
+	</h6>
+	<div id="sec80" style="display: none;">
+		<table class="container w3table-1" caption="Income">
+			<tbody><tr>
+				<td>
+					<label class="col-sm-9 col-xs-12 control-label">Basic Deductions - 80C  (Tax Saving schemes PPF, ELSS Funds, LIC etc)</label>
+				</td>
+				<td align="center">
+					<input class="wdth270" type="text" id="sec80CDeds" maxlength="6" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateDeductions();" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+					<p id="sec80CDedsMsg"></p>
+				</td>	
+				
+			</tr>
+			<tr>
+				<td>
+					<label class="col-sm-9 col-xs-12 control-label">Medical Insurance - 80D</label>
+				</td>
+				<td align="center">
+					<input class="wdth270" type="text" id="sec80DDeds" maxlength="5" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateDeductions()" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+					<p id="sec80DDedsMsg"></p>
+				</td>	
+			</tr>
+			<tr>
+				<td>
+					<label class="col-sm-9 col-xs-12 control-label">Interest on Educational Loan - 80E</label>
+				</td>
+				<td align="center">
+					<input class="wdth270" type="text" id="sec80EDeds" maxlength="6" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateDeductions()" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+					<p id="sec80EDedsMsg"></p>
+				</td>	
+			</tr>
+			<tr>
+				<td>
+					<label class="col-sm-9 col-xs-12 control-label">Donations to Charity - 80G </label>
+				</td>
+				<td align="center">
+					<input class="wdth270" type="text" id="sec80GDeds" maxlength="18" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateDeductions()" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+					<p id="sec80GDedsMsg"></p>
+				</td>	
+			</tr>
+			<tr>
+				<td>
+					<label class="col-sm-9 col-xs-12 control-label">Interest from Deposits - 80TTA  </label>
+				</td>
+				<td align="center">
+					<input class="wdth270" type="text" id="sec80TDeds" maxlength="5" value="0" align="center" style="text-align:right" onchange="if(validateIncomesDeductions())updateDeductions()" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+					<p id="sec80TDedsMsg"></p>
+				</td>	
+			</tr>
+		<tr>
+		</tr></tbody></table>
+	</div>	
+	
+	<br>
+	 <h6 align="left">Tax Computation</h6>
+		<table class="container w3table-1" caption="Tax Computation">
+		<tbody><tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Net Taxable Income</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="netTaxableIncome" type="text" maxlength="18" value="0" align="center" style="text-align: right; background: rgb(255, 255, 255);" onchange="calculateTax()" onfocus="checkAndRemove0(this);" onblur="checkAndPopulate0(this);">
+			</td>
+				
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Income Tax</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="totalTax" type="text" maxlength="18" value="0" align="center" style="text-align:right" disabled="">
+			</td>
+				
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Surcharge</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" type="text" id="surcharge" maxlength="18" value="0" align="center" style="text-align:right" disabled="">
+			</td>
+				
+		</tr>
+		<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Total Cess</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="cess" type="text" maxlength="18" value="0" align="center" style="text-align:right" disabled="">
+			</td>
+				
+		</tr>
+			<tr>
+			<td>
+				<label class="col-sm-9 col-xs-12 control-label">Total Tax Liability</label>
+			</td>
+			<td align="center">
+				<input class="wdth270" id="taxLiability" type="text" maxlength="18" value="0" align="center" style="text-align:right" disabled="">
+			</td>
+				
+		</tr>
+	</tbody></table>
+</div>
+<br>
+<p>Tax Calculator Developed by 
+<a href="mailto:nikhil.k320@gmail.com?Subject=User%20Connect">Nikhil Khatri  .</a>
+<a href="https://www.linkedin.com/in/nikhil28/" target="_blank"><img src="file:///N:/Programming/TaxCalculator/linkedin.png" height="20" width="20"></a>
+<a href="https://www.facebook.com/Nikhilkhatri28" target="_blank"><img src="file:///N:/Programming/TaxCalculator/fb.png" height="25" width="25"></a>
+<a href="https://www.youtube.com/channel/UCp7E3692UeQqFli7BDWh6Bw/videos" target="_blank"><img src="file:///N:/Programming/TaxCalculator/youtube.png" height="30" width="30"></a>
+</p>
+</div>
+
+
+</body></html>
