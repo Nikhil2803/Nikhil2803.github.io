@@ -1,0 +1,495 @@
+<html>
+    <head>
+        <title>Sudoku Puzzle</title>
+    </head>
+	<script>
+		var counter =0;
+		var interval =null;
+		
+		function startTimer(){
+			if(interval==null){
+			 interval =setInterval(updateTime, 1000);
+			 }
+		}
+		
+		function stopTimer(){
+			if(interval!=null && interval!=undefined){
+				clearInterval(interval);
+			 }
+		}
+		
+		function updateTime(){
+			var minutes = Math.floor(counter/60);
+			var seconds = Math.floor(counter%60);
+			document.getElementById("timer").innerHTML = "Time Elapsed: " + minutes + " Minutes, " + seconds + " Seconds ";
+			counter = counter+1;
+		}
+	
+		function validateAndHighlightCell(element){
+		
+			if(element.value != ''){
+				var isValid = validateCellForValue(element.id, element.value);
+				if(isValid == true){
+					element.style.color = "green";
+				}else{
+					element.style.color = "red";
+				}
+			}else{
+				element.style.color = "black";
+			}
+		}
+		
+		function highlightSection(element){
+			clearHighlights();
+			var row = parseInt((element.id+"").charAt(0));
+			var col = parseInt((element.id+"").charAt(1));
+			
+			for(var i=0;i<9;i++){
+				var rowElement =  document.getElementById(row+''+i);
+				if(rowElement.disabled==false){
+					rowElement.style.background='#FBF5DE';
+				}
+				
+				var colElement =  document.getElementById(i+''+col);
+				if(colElement.disabled==false){
+					colElement.style.background='#FBF5DE';
+				}
+			}
+			
+			var startOfQuadRow = row - (row%3)
+			var startOfQuadCol = col - (col%3)
+			for(var i=startOfQuadRow;i<startOfQuadRow+3;i++){
+				for(var j=startOfQuadCol;j<startOfQuadCol+3;j++){
+					var qelement =  document.getElementById(i+''+j);
+					if(qelement.disabled==false){
+					qelement.style.background='#FBF5DE';
+					}
+				}
+			}
+			
+		}
+		
+		function clearHighlights(){
+		var elements = document.getElementsByTagName('input');
+			for(var i=0; i<elements.length;i++){
+				if(elements[i].disabled==false){
+					elements[i].style.background='white';
+				}
+			}
+		}
+		
+		function clearPuzzle(){
+			var elements = document.getElementsByTagName('input');
+			for(var i=0; i<elements.length;i++){
+				elements[i].disabled=false;
+				elements[i].style.background='white';
+				elements[i].value='';
+			}
+			document.getElementById("timer").innerHTML ="";
+			document.getElementById("result").innerHTML ="";
+		}
+		
+		function generateSukodu(){
+			clearPuzzle();
+			generateSubMatrix(0,0);
+			generateSubMatrix(3,3);
+			generateSubMatrix(6,6);
+			
+			generateSubMatrix(0,6);
+			generateSubMatrix(3,0);
+			generateSubMatrix(6,3);
+			startTimer();
+		}
+		
+		function generateSubMatrix(rowStart,colStart){
+			var numOfVal = (Math.random()*10)%9;
+			for(var i=0; i< numOfVal;i++){
+				var row = rowStart + parseInt((Math.random()*10)%3);
+				var col = colStart + parseInt((Math.random()*10)%3);
+				var value = 1;
+				while(value<9){
+					var isValid = validateCellForValue(row+''+col, value);
+					if(isValid==true){
+						var element = document.getElementById(row+''+col);
+						element.value=value;
+						element.style.background='#CACBCC';
+						element.disabled=true;
+						break;
+					}
+					++value;
+				}
+			}
+		}
+		
+		
+		function validateSudoku(){
+			var isValidSudoku = true;
+			for(var i=0;i<9;i++){
+				for(var j=0;j<9;j++){
+					var element = document.getElementById(i+''+j);
+					if(element.disabled==false){
+						if(element.value !=null && element.value != ''){
+							var isCellValid=validateCellForValue(element.id, element.value);
+							if(isCellValid==false){
+								element.style.background='#FA6C6C';
+								isValidSudoku=false;
+								document.getElementById("result").innerHTML = "Sudoku solution is invalid. Please retry :)";
+								document.getElementById("result").style.color="red";
+							}else{
+								element.style.background='#4CC0F9';
+							}
+						}else{
+							document.getElementById("result").innerHTML = "Sudoku is not completely filled. Please complete it and then validate. ";
+							document.getElementById("result").style.color="red";
+							isValidSudoku=false;
+							break;
+						}
+					}
+				}
+				if(isValidSudoku==false){
+					break;
+				 }
+			}
+			if(isValidSudoku==true){
+				document.getElementById("result").innerHTML = "Hurray!! You have successfully solved the sudoku puzzle.";
+				document.getElementById("result").style.color="green";
+				stopTimer();
+			}
+			return isValidSudoku;
+		}
+		
+		function validateCellForValue(id, value){
+			var row = parseInt((id+"").charAt(0));
+			var col = parseInt((id+"").charAt(1));
+			for(var i=0;i<9;i++){
+				if(id != row+''+i && document.getElementById(row+''+i).value !='' && document.getElementById(row+''+i).value == value){
+					return false;
+				}
+				if(id != i+''+col && document.getElementById(i+''+col).value !='' && document.getElementById(i+''+col).value == value){
+					return false;
+				}
+			}
+			var startOfQuadRow = row - (row%3)
+			var startOfQuadCol = col - (col%3)
+			for(var i=startOfQuadRow;i<startOfQuadRow+3;i++){
+				for(var j=startOfQuadCol;j<startOfQuadCol+3;j++){
+					if(id != i+''+j && document.getElementById(i+''+j).value !='' && document.getElementById(i+''+j).value == value){
+						return false;
+				}
+				}
+			}
+			return true;
+		}
+		
+		function solveSudoku(row, col,value){
+			
+			var val = value;
+			var element = document.getElementById(row+''+col);
+			
+			if(element.disabled==false){
+				if(element.value == ''){
+					while (val <= 9) {
+						if (validateCellForValue(row+''+col, val)) {
+							element.value = val;
+							break;
+						} else {
+							++val;
+						}
+					}
+					if (element.value == '') {
+						return false;
+					}
+				}
+			}
+			
+			if(row==8 && col ==8 & element.value !=''){
+				console.log('Sudoku solution completed');
+				return true;
+			}
+			
+			
+		if(col<8){
+            //try solving next cell
+            if(solveSudoku(row,(col+1),1)){
+                return true;
+            }else{
+                //If next solution is failing for all number, clear current cell and re-try with other number
+                if(element.disabled==true){
+                    return false;
+                }else{
+                    element.value ='';
+                    return solveSudoku(row,col,++val);
+                }
+            }
+        }else{
+            if(solveSudoku(row+1,0,1)){
+                return true;
+            }else{
+                //If next solution is failing for all number, clear current cell and re-try with other number
+                if(element.disabled==true){
+                    return false;
+                }else{
+                     element.value ='';
+                    return solveSudoku(row,col,++val);
+                }
+            }
+        }
+			stopTimer();
+		}
+	
+		function lockCustomPuzzle(){
+			for(var i=0;i<9;i++){
+				for(var j=0;j<9;j++){
+					var element = document.getElementById(i+''+j);
+					if(element.value != ''){
+						element.disabled = true;
+						element.style.background='#CACBCC';
+					}
+				}
+			}
+			startTimer();
+		}
+	
+	</script>
+	<style>
+	 .button {
+	  display: inline-block;
+	  border-radius: 4px;
+	  border: none;
+	  text-align: center;
+	  color: #FFFFFF;
+	  font-size: 20px;
+	  padding: 5px;
+	  width: 150px;
+	  transition: all 0.5s;
+	  cursor: pointer;
+	  margin: 10px;
+	  box-shadow: 0px 0px 5px 5px #1E5D5C;
+	}
+
+	.button span {
+	  cursor: pointer;
+	  display: inline-block;
+	  position: relative;
+	  transition: 0.5s;
+	}
+
+	.button span:after {
+	  content: '\00bb';
+	  position: absolute;
+	  opacity: 0;
+	  top: 0;
+	  right: -20px;
+	  transition: 0.5s;
+	}
+
+	.button:hover span {
+	  padding-right: 25px;
+	}
+
+	.button:hover span:after {
+	  opacity: 1;
+	  right: 0;
+	}
+	
+	.sudoku_board {
+		margin:50px auto;
+		background-color:#C1A157;
+		overflow: hidden;
+		box-shadow: 0px 0px 10px 10px #1E5D5C;
+	}
+	.cell {
+		text-align:center;
+		 font-size: 15px;
+		 font-weight: bold;
+		padding: 5px;
+	}
+	.cell:hover {
+		text-align:center;
+		background:#F5E35A;
+		 box-shadow: 0px 0px 0px 1px #EC5656;
+	}
+	
+	header{
+		background:DarkSalmon;
+		 color: white;
+		 padding: 3px;
+		 box-shadow: 0px 0px 0px 3px #EC5656;
+		  margin: 10px;
+	}
+ 
+	footer {
+	  margin: 10px;
+	  text-align: center;
+	  padding: 3px;
+	  background-color: DarkSalmon;
+	  box-shadow: 0px 0px 0px 3px #EC5656;
+	  color: white;
+	}
+	</style>
+    <body style="background:#9FF0EF" >
+		<header class="header" align="center" >
+			<h1>Sudoku Puzzle Game</h1>
+		</header>
+		
+        <main align="center" >
+            <br />
+            <!-- Table tag with a border property representing 2 pixel borders -->
+			<div>
+				<button class="button" style="vertical-align:middle;background-color:green;" onClick="generateSukodu()"><span>Generate New Puzzle</span></button>
+				<button class="button" style="vertical-align:middle;background-color:green;" onClick="lockCustomPuzzle()"><span>Lock My Puzzle</span></button>
+			</div>
+			
+			<div>
+				<p> <span id="timer" style="color:red;"></span></p>
+			</div>
+			
+            <table border="2" align="center" style="text-align:center" class="sudoku_board" >
+
+                <tr>
+                    <!-- First three cells have a 3, 9, and 8 -->
+                    <td><input class="cell" id="00" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="01" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="02" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;" onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="03" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="04" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="05" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="06" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="07" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="08"type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr>
+                    <td><input class="cell" id="10" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="11" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="12" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"  onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="13" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="14" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="15" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="16" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="17" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="18" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr>
+                    <td><input class="cell" id="20" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="21" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="22" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"  onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="23" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="24" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="25" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="26" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="27" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="28" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr></tr>
+                <tr></tr>
+                <tr>
+                    <td><input class="cell" id="30" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="31" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="32" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"  onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="33" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="34"  type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="35" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="36" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="37" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="38" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr>
+                    <td><input class="cell" id="40" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="41" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="42" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"   onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="43" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="44" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="45" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="46" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="47" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="48" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr>
+                    <td><input class="cell" id="50" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="51" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="52" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"  onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="53" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="54" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="55" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="56" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="57" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="58" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr></tr>
+                <tr></tr>
+                <tr>
+                    <td><input class="cell" id="60" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="61" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="62" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"  onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="63" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="64" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="65" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="66" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="67" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="68" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr>
+                    <td><input class="cell" id="70" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="71" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="72" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"  onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell" id="73" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="74" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="75" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="76" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="77" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="78" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                </tr>
+                <tr>
+                    <td><input class="cell"  id="80" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell"  id="81" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell"  id="82" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <!-- empty cells filled with non-breaking spaces to give more whitespace -->
+                    <td style="border: none;"   onBlur="validateAndHighlightCell(this)" ></td>
+                   <td><input class="cell"  id="83" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="84" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="85" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td style="border: none"  onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="86" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="87" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+                    <td><input class="cell" id="88" type="text" size="1" value="" onClick="highlightSection(this)"   onBlur="validateAndHighlightCell(this)" ></td>
+			</table>
+       
+			<div>
+				<p> <span id="result"></span></p>
+			</div>
+			
+			<div>
+			<button class="button" style="vertical-align:middle;background-color:green;" onClick="solveSudoku(0,0,1)"><span>Generate Solution</span></button>
+			<button class="button" style="vertical-align:middle;background-color:green;" onClick="validateSudoku()"><span>Validate Solution</span></button>
+			</div>
+		</main>
+<footer>
+  <p>Author: <a href="https://www.linkedin.com/in/nikhil28/">Nikhil Khatri</a><br>
+  <a href="mailto:nikhil.k320@gmail.com">nikhil.k320@gmail.com</a></p>
+</footer>
+	</body>
+</html>
