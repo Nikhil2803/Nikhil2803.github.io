@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Tools</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: auto;
+        }
+        #header {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 15px;
+			width: 100%;
+			z-index: 1000;
+            font-size: 20px;
+            font-weight: bold;
+			position: fixed; /* Fix the header at the top */
+			top: 0; /* Ensure it's at the top */
+        }
+        .container {
+            display: flex;
+            flex: 1;
+			margin-top: 60px; /* Add space for the fixed header */
+        }
+        #sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        #sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            border-radius: 5px;
+        }
+        #sidebar a:hover {
+            background: #34495e;
+        }
+        #content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        .tool-container {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+			overflow-y: auto; /* Enable vertical scrolling */
+			overflow-x: auto; /* Enable horizontal scrolling if needed */
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 5px;
+            resize: none;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        #defaultContent {
+            text-align: center;
+            padding: 20px;
+        }
+        #defaultContent img {
+            width: 200px;
+            margin-top: 20px;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        iframe {
+            border: none;
+        }
+		
+		
+    </style>
+</head>
+<body>
+    <div id="header">Developer Utility Tools</div>
+    <div class="container">
+        <div id="sidebar" >
+            <h2>Dev Tools</h2>
+				<a href="#" onclick="showTool('defaultContent')">Home</a>
+				<a href="#" onclick="showTool('ipfinder')">IP Finder</a>
+				<a href="#" onclick="showTool('regexTester')">Regex Tester</a>
+				<a href="#" onclick="showTool('colorPicker')">Color Picker</a>
+				<a href="#" onclick="showTool('qrgenerator')">QR Generator</a>
+				<a href="#" onclick="showTool('diff')">Diff Checker</a>
+				<a href="#" onclick="showTool('wordCounter')">Word Counter</a>
+			<h3>Encoders/Decoders</h3>
+				<a href="#" onclick="showTool('base64')">Base64 Converter</a>
+				<a href="#" onclick="showTool('urlEncoder')">URL Encoder/Decoder</a>
+				<a href="#" onclick="showTool('sha256')">SHA256 Hash Generator</a>
+			<h3>Formatters</h3>
+				<a href="#" onclick="showTool('jsonFormatter')">JSON Formatter</a>
+				<a href="#" onclick="showTool('xmlFormatter')">XML Formatter</a>
+            <h3>Games</h3>
+				<a href="#" onclick="showTool('sudoku')">Sudoku</a>
+				<a href="#" onclick="showTool('ticTacToe')">Tic Tac Toe</a>
+			<h3>About</h3>	
+			<a onclick="showTool('about-author')">About Author</a>
+        </div>
+        <div id="content">
+            
+			<div id="defaultContent">
+                <h2>Welcome to Developer Utility Tools</h2>
+                <p>A set of utility tools frequently used by developers. 
+				Developed by <a href="https://www.linkedin.com/in/nikhil28" target="_blank">Nikhil Khatri</a> 
+				to assist developers with day-to-day development tasks.</p>
+				<br/>
+				<img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWt2aHYwcjVycTRlYmtyaGFsOWgwNGNydGx0b3hmamRjaTNiYWdnaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wBb49opfELu6xrcpri/giphy.gif"/>
+            </div>
+			
+            <!-- Base64 Tool -->
+            <div id="base64" class="tool-container">
+                <h3>Base64 Converter</h3>
+                <textarea id="base64Input" placeholder="Enter text to encode or decode"></textarea>
+                <button onclick="convertBase64()">Convert</button>
+                <textarea id="base64Output" placeholder="Base64 output" readonly></textarea>
+                <p id="base64Error" class="error-message"></p>
+            </div>
+
+            <!-- Diff Checker Tool -->
+            <div id="diff" class="tool-container">
+                <h3>Diff Checker</h3>
+                <textarea id="diffInput1" placeholder="Enter first text"></textarea>
+                <textarea id="diffInput2" placeholder="Enter second text"></textarea>
+                <button onclick="compareDiff()">Compare</button>
+                <div id="diffResult"></div>
+            </div>
+
+            <!-- JSON Formatter -->
+            <div id="jsonFormatter" class="tool-container">
+                <h3>JSON Formatter</h3>
+                <textarea id="jsonInput" placeholder="Enter JSON here"></textarea>
+                <button onclick="formatJSON()">Format JSON</button>
+                <textarea id="jsonOutput" placeholder="Formatted JSON" readonly></textarea>
+                <p id="jsonError" class="error-message"></p>
+            </div>
+
+            <!-- XML Formatter -->
+            <div id="xmlFormatter" class="tool-container">
+                <h3>XML Formatter</h3>
+                <textarea id="xmlInput" placeholder="Enter XML here"></textarea>
+                <button onclick="formatXML()">Format XML</button>
+                <textarea id="xmlOutput" placeholder="Formatted XML" readonly></textarea>
+                <p id="xmlError" class="error-message"></p>
+            </div>
+
+            <!-- Color Picker -->
+            <div id="colorPicker" class="tool-container">
+                <h3>Color Picker</h3>
+                <p><span>Select Color:</span><input type="color" id="colorInput" style="width:150px" onchange="updateColor()">
+                <p><span>Hex Value:</span> <input type="text" value="#000000" id="hexValue"></input></p>
+                <p><span>RGB Value:</span> <input type="text" value="rgb(0, 0, 0)" id="rgbValue"></input></p>
+            </div>
+
+            <!-- Word Counter -->
+            <div id="wordCounter" class="tool-container">
+                <h3>Word Counter</h3>
+                <textarea id="wordCountInput" placeholder="Enter text"></textarea>
+                <p id="wordCountResult">Word count: 0</p>
+            </div>
+			
+			 <!-- IP Finder -->
+            <div id="ipfinder" class="tool-container">
+                <h3>Find the IP of Address</h3>
+                <textarea id="urlForIP" placeholder="Enter URL"></textarea>
+				 <button onclick="getIPAddress()">Get IP Details</button>
+                <p>IP Details:</p>
+                <textarea id="ipDetails"></textarea>
+            </div>
+			
+			 <!-- QR Generator -->
+            <div id="qrgenerator" class="tool-container">
+                <h3>Generate QR for Given content:</h3>
+                <textarea id="textForQR" placeholder="Enter Text"></textarea>
+				 <button onclick="generateQR()">Generate QR</button>
+                <p>QR:</p>
+				 <div align="center">
+                 <img id="qrCode" src="" alt="QR Code" style="display:None;"/>
+				 <button id= "qrdwnldbtn" onclick="downloadQR()" style="display:None;">Download QR</button>
+				 </div>
+            </div>
+
+            <!-- SHA256 Generator -->
+            <div id="sha256" class="tool-container">
+                <h3>SHA256 Hash Generator</h3>
+                <textarea id="sha256Input" placeholder="Enter text to hash..."></textarea>
+                <button onclick="generateSHA256()">Generate Hash</button>
+                <p>Output:</p>
+                <textarea id="sha256Output" readonly></textarea>
+                <p id="sha256Error" class="error-message"></p>
+            </div>
+			
+			<!-- URL Encoder/Decoder Tool -->
+            <div id="urlEncoder" class="tool-container">
+                    <h3>URL Encoder/Decoder</h3>
+                    <div class="mb-3">
+                        <label for="urlInput" class="form-label">Enter URL (or text)</label>
+                        <textarea id="urlInput" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="encodeDecodeURL()">Encode/Decode URL</button>
+                    <div class="mt-3">
+                        <label for="urlOutput" class="form-label">Output</label>
+                        <textarea id="urlOutput" class="form-control" rows="3" readonly></textarea>
+                    </div>
+					
+					<button class="btn btn-info mb-1" onclick="toggleRules('encodingRules')">Show/Hide Encoding Rules</button>
+                    <div id="encodingRules" class="conversion-rules" style="display: none;">
+                        <h5>URL Encoding Rules:</h5>
+                        <ul>
+                            <li>Space → %20</li>
+                            <li>`&` → %26</li>
+                            <li>`/` → %2F</li>
+                            <li>`?` → %3F</li>
+                            <li>`=` → %3D</li>
+                            <li>`#` → %23</li>
+                        </ul>
+                    </div>
+					
+                </div>
+				
+			<div id="regexTester" class="tool-container">
+                    <h3>Regex Tester</h3>
+                   
+                    <div class="mb-3">
+                        <label for="regexInput" class="form-label">Enter Regular Expression</label>
+                        <input type="text" id="regexInput" class="form-control" placeholder="e.g., \d+" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="textInput" class="form-label">Enter Text Content</label>
+                        <textarea id="textInput" class="form-control" rows="6"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="testRegex()">Test Regex</button>
+                    <div class="mt-3">
+                        <label for="regexOutput" class="form-label">Output</label>
+                        <p id="regexOutput" class="form-control" rows="6" readonly></p>
+                    </div>
+					
+					<button class="btn btn-info mb-2" onclick="toggleRules('regexRules')">Show/Hide Regex Rules</button>
+                    <div id="regexRules" class="conversion-rules" style="display: none;">
+                        <h5>Regex Syntax Rules:</h5>
+                        <ul>
+                            <li><strong>`.`</strong> → Matches any single character except newline</li>
+                            <li><strong>`^`</strong> → Anchors a match to the start of the string</li>
+                            <li><strong>`$`</strong> → Anchors a match to the end of the string</li>
+                            <li><strong>`[abc]`</strong> → Matches any of the characters `a`, `b`, or `c`</li>
+                            <li><strong>`[^abc]`</strong> → Matches any character except `a`, `b`, or `c`</li>
+                            <li><strong>`*`</strong> → Matches 0 or more of the preceding element</li>
+                            <li><strong>`+`</strong> → Matches 1 or more of the preceding element</li>
+                            <li><strong>`{n,m}`</strong> → Matches between `n` and `m` occurrences of the preceding element</li>
+                        </ul>
+                    </div>
+                </div>
+
+
+            <!-- Game -->
+            <div id="ticTacToe" class="tool-container">
+                <h3>Tic Tac Toe</h3>
+                <iframe src="https://nikhil2803.github.io/TicTacToe" width="100%" height="500px"></iframe>
+            </div>
+			 <div id="sudoku" class="tool-container">
+                <h3>Sudoku</h3>
+                <iframe src="https://nikhil2803.github.io/Sudoku" width="100%" height="500px"></iframe>
+            </div>
+			
+			<div id="about-author" class="tool-container">
+			  <h2>About the Author</h2>
+			  <p>Hi! I'm Nikhil Khatri, a passionate developer who enjoys building efficient and scalable tools. 
+			  With a keen interest in technology, I aim to create innovative solutions to help people solve complex problems. 
+			  I specialize in web development, coding best practices, and improving user experiences.</p>
+			  
+			  <h3>Contact</h3>
+			  <p>Email: <a href="mailto:nikhil.k320@gamil.com">nikhil.k320@gmail.com</a></p>
+			  <p>LinkedIn: <a href="https://www.linkedin.com/in/nikhil28" target="_blank">Nikhil Khatri</a></p>
+			</div>
+        </div>
+    </div>
+
+    <footer>
+        Developed by <a href="https://www.linkedin.com/in/nikhil28" target="_blank" style = "color:white">Nikhil Khatri</a> 
+    </footer>
+
+    <script>
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-container').forEach(div => div.style.display = 'none');
+            document.getElementById('defaultContent').style.display = 'none';
+            const tool = document.getElementById(toolId);
+            if (tool) {
+                tool.style.display = 'block';
+            }
+        }
+
+        // Base64 Converter Function
+        function convertBase64() {
+            const inputText = document.getElementById('base64Input').value;
+            const errorElement = document.getElementById('base64Error');
+            errorElement.style.display = 'none';
+            if (inputText === '') {
+                errorElement.textContent = 'Please enter text to encode or decode.';
+                errorElement.style.display = 'block';
+                return;
+            }
+            const base64Text = btoa(inputText);
+            document.getElementById('base64Output').value = base64Text;
+        }
+
+        // Diff Checker Function
+        function compareDiff() {
+            const text1 = document.getElementById('diffInput1').value;
+            const text2 = document.getElementById('diffInput2').value;
+            const result = document.getElementById('diffResult');
+            if (text1 === text2) {
+                result.innerHTML = '<p>Texts are the same</p>';
+            } else {
+                result.innerHTML = '<p>Texts are different</p>';
+            }
+        }
+
+        // JSON Formatter
+        function formatJSON() {
+            const inputText = document.getElementById('jsonInput').value;
+            const outputElement = document.getElementById('jsonOutput');
+            const errorElement = document.getElementById('jsonError');
+            try {
+                const formattedJSON = JSON.stringify(JSON.parse(inputText), null, 4);
+                outputElement.value = formattedJSON;
+                errorElement.style.display = 'none';
+            } catch (e) {
+                errorElement.textContent = 'Invalid JSON input.';
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // XML Formatter
+        function formatXML() {
+            const inputText = document.getElementById('xmlInput').value;
+            const outputElement = document.getElementById('xmlOutput');
+            const errorElement = document.getElementById('xmlError');
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(inputText, 'text/xml');
+                const formattedXML = new XMLSerializer().serializeToString(xmlDoc);
+                outputElement.value =  formattedXML.replace(/(>)(<)(\/*)/g, '$1\n$2$3'); // Add new lines for readability
+                errorElement.style.display = 'none';
+            } catch (e) {
+                errorElement.textContent = 'Invalid XML input.';
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // Color Picker
+        function updateColor() {
+            const color = document.getElementById('colorInput').value;
+            document.getElementById('hexValue').value = color;
+            const rgb = hexToRgb(color);
+            document.getElementById('rgbValue').value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        }
+
+        function hexToRgb(hex) {
+            const match = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+            return {
+                r: parseInt(match[1], 16),
+                g: parseInt(match[2], 16),
+                b: parseInt(match[3], 16)
+            };
+        }
+
+        // Word Counter
+        document.getElementById('wordCountInput').addEventListener('input', function() {
+            const text = this.value;
+            const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            document.getElementById('wordCountResult').textContent = `Word count: ${wordCount}`;
+        });
+
+        // SHA256 Hash Generator
+        function generateSHA256() {
+            const text = document.getElementById('sha256Input').value;
+            const errorElement = document.getElementById('sha256Error');
+            errorElement.style.display = 'none';
+            if (text === '') {
+                errorElement.textContent = 'Please enter text to generate SHA256 hash.';
+                errorElement.style.display = 'block';
+                return;
+            }
+            const hash = CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
+            document.getElementById('sha256Output').value = hash;
+        }
+		
+		 //URL Encoder/Decoder  
+        function encodeDecodeURL() {
+            const urlInput = document.getElementById('urlInput').value;
+            const outputField = document.getElementById('urlOutput');
+            try {
+                // Check if the input URL is already encoded
+                if (urlInput.includes('%')) {
+                    // If it's encoded, decode it
+                    outputField.value = decodeURIComponent(urlInput);
+                } else {
+                    // Else, encode the input
+                    outputField.value = encodeURIComponent(urlInput);
+                }
+            } catch (e) {
+                showError('Error: Invalid input for URL encoding/decoding.');
+            }
+        }
+		
+		function testRegex() {
+            const regexInput = document.getElementById('regexInput').value;
+            const textInput = document.getElementById('textInput').value;
+            const regexOutput = document.getElementById('regexOutput');
+
+            try {
+                const regex = new RegExp(regexInput, 'g');
+                const highlightedText = textInput.replace(regex, match => `<span class="highlight" style="background:#6ede80">${match}</span>`);
+                regexOutput.innerHTML = highlightedText;
+            } catch (e) {
+                showError('Error: Invalid regular expression.');
+            }
+        }
+		
+		function toggleRules(rulesId) {
+            const rulesDiv = document.getElementById(rulesId);
+            if (rulesDiv.style.display === 'none') {
+                rulesDiv.style.display = 'block';
+            } else {
+                rulesDiv.style.display = 'none';
+            }
+        }
+		
+		function getIPAddress(){
+		 const inputUrl = document.getElementById('urlForIP').value;
+		 const url = new URL(inputUrl);
+			// Extract the hostname (domain) from the URL
+        const domain = url.hostname;
+		 fetch(`http://ip-api.com/json/${domain}`)
+            .then(response => response.json())
+            .then(data => {
+                // Display the IP address in the paragraph with id "ipAddress"
+                document.getElementById('ipDetails').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error fetching IP:', error);
+                document.getElementById('ipDetails').textContent = 'Unable to retrieve IP address.';
+            });
+			
+		}
+		
+		function generateQR(){
+			const content = document.getElementById('textForQR').value;
+			const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(content)}`;
+			document.getElementById('qrCode').src = qrUrl
+			document.getElementById('qrCode').style.display = 'block';
+			document.getElementById('qrdwnldbtn').style.display = 'block';
+		}
+		
+		function downloadQR(){
+		  const link = document.createElement("a");
+		  link.href =  document.getElementById('qrCode').src;
+		  link.target = "_blank";
+		  link.download = "qrcode.png";
+		  document.body.appendChild(link);
+		  link.click();
+		  document.body.removeChild(link);
+		}
+    </script>
+
+    <!-- Add CryptoJS library for SHA256 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1-crypto-js.js"></script>
+</body>
+</html>
