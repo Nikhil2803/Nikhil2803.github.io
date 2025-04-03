@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Dev Tools</title>
     <style>
         body {
@@ -37,6 +37,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+			overflow-x: auto;
             overflow-y: auto;
         }
         #sidebar a {
@@ -122,7 +123,7 @@
     <div id="header">Developer Utility Tools</div>
     <div class="container">
         <div id="sidebar" >
-            <h2>Dev Tools</h2>
+           <h2>Dev Tools </h2>
 				<a href="#" onclick="showTool('defaultContent')">Home</a>
 				<a href="#" onclick="showTool('ipfinder')">IP Finder</a>
 				<a href="#" onclick="showTool('regexTester')">Regex Tester</a>
@@ -130,6 +131,9 @@
 				<a href="#" onclick="showTool('qrgenerator')">QR Generator</a>
 				<a href="#" onclick="showTool('diff')">Diff Checker</a>
 				<a href="#" onclick="showTool('wordCounter')">Word Counter</a>
+			<h3>Finance Calculators</h3>
+				<a href="#" onclick="showTool('ci-calculator')">Compound Interest Calculator</a>
+				<a href="#" onclick="showTool('emi-calculator')">EMI Calculator</a>
 			<h3>Encoders/Decoders</h3>
 				<a href="#" onclick="showTool('base64')">Base64 Converter</a>
 				<a href="#" onclick="showTool('urlEncoder')">URL Encoder/Decoder</a>
@@ -297,6 +301,57 @@
                     </div>
                 </div>
 
+			  <div id="ci-calculator" class="tool-container">
+				<h3>Compound Interest Calculator</h3>
+				
+				<label>Principal Amount:</label>
+				₹ <input type="number" id="principal" value="10000" />
+				<hr/>
+				
+				<div class="slider-container">
+					<label>Rate of Interest (%):</label>
+					<input type="range" id="roi-slider" min="1" max="50" value="5" oninput="syncROI()" />
+					<input type="number" id="roi" value="5" oninput="syncSlider()" />
+				</div>
+				<hr/>
+				
+				<label>Compounding Frequency (Months):</label>
+				<input type="number" id="compoundingMonths" value="12" />
+				<hr/>
+				
+				<label>Time Period (Years):</label>
+				<input type="number" id="years" value="10" />
+				<hr/>
+				
+				<button onclick="calculateCompoundInterest()">Calculate</button>
+				
+				<div class="result" id="result"></div>
+			</div>
+			
+			<div  id="emi-calculator" class="tool-container">
+				<h3>EMI Calculator</h3>
+				<label>Loan Amount:</label>
+				<input type="range" id="loan-amt-slider" min="50000" max="100000000" value="10" oninput="syncLoanAmt()" />
+				₹ <input type="number" id="loanAmount" value="500000" />
+				<hr/>
+				
+			
+				<div class="slider-container">
+					<label>Loan Rate (%):</label>
+					<input type="range" id="loan-roi-slider" min="1" max="50" value="5" oninput="syncLoanROI()" />
+					<input type="number" id="loanRoi" value="5" oninput="syncLoanSlider()" />
+				</div>
+				<hr/>
+				
+				<label>Time Period (Years):</label>
+				<input type="number" id="loanYears" value="10" />
+				<hr/>
+				
+				<button onclick="calculateEMI()">Calculate EMI</button>
+				
+				<div class="result" id="emiResult"></div>
+			</div>
+	
 
             <!-- Game -->
             <div id="ticTacToe" class="tool-container">
@@ -326,6 +381,8 @@
     </footer>
 
     <script>
+	
+	
         function showTool(toolId) {
             document.querySelectorAll('.tool-container').forEach(div => div.style.display = 'none');
             document.getElementById('defaultContent').style.display = 'none';
@@ -449,19 +506,6 @@
             }
         }
 		
-		function testRegex() {
-            const regexInput = document.getElementById('regexInput').value;
-            const textInput = document.getElementById('textInput').value;
-            const regexOutput = document.getElementById('regexOutput');
-
-            try {
-                const regex = new RegExp(regexInput, 'g');
-                const highlightedText = textInput.replace(regex, match => `<span class="highlight" style="background:#6ede80">${match}</span>`);
-                regexOutput.innerHTML = highlightedText;
-            } catch (e) {
-                showError('Error: Invalid regular expression.');
-            }
-        }
 		
 		function toggleRules(rulesId) {
             const rulesDiv = document.getElementById(rulesId);
@@ -507,6 +551,80 @@
 		  link.click();
 		  document.body.removeChild(link);
 		}
+		
+		function syncROI() {
+            document.getElementById("roi").value = document.getElementById("roi-slider").value;
+        }
+        
+        function syncSlider() {
+            document.getElementById("roi-slider").value = document.getElementById("roi").value;
+        }
+		
+		function syncLoanROI() {
+            document.getElementById("loanRoi").value = document.getElementById("loan-roi-slider").value;
+        }
+        
+        function syncLoanSlider() {
+            document.getElementById("loan-roi-slider").value = document.getElementById("loanRoi").value;
+        }
+		
+		function syncLoanAmt() {
+            document.getElementById("loanAmount").value = document.getElementById("loan-amt-slider").value;
+        }
+		
+        
+        function calculateCompoundInterest() {
+            let principal = parseFloat(document.getElementById("principal").value);
+            let roi = parseFloat(document.getElementById("roi").value);
+            let compoundingMonths = parseInt(document.getElementById("compoundingMonths").value);
+            let years = parseInt(document.getElementById("years").value);
+            
+            let rate = roi / 100;
+            let n = 12 / compoundingMonths;
+            let amount = principal * Math.pow(1 + rate / n, n * years);
+            let doubleTime = (Math.log(2) / Math.log(1 + rate / n) / n).toFixed(2);
+            
+            document.getElementById("result").innerHTML = `
+                <h3>Results</h3>
+                <p>Maturity Amount: <span style="color:blue">₹${amount.toFixed(2)}</span></p>
+                <p>Time to Double Principal: <span style="color:blue">${doubleTime} years</span></p>
+            `;
+        }
+		
+		function calculateEMI() {
+            let loanAmount = parseFloat(document.getElementById("loanAmount").value);
+            let loanRoi = parseFloat(document.getElementById("loanRoi").value);
+            let loanYears = parseInt(document.getElementById("loanYears").value);
+            
+            let monthlyRate = (loanRoi / 100) / 12;
+            let months = loanYears * 12;
+            let emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            let totalInterest = (emi * months) - loanAmount;
+            let interestYears = (totalInterest / (emi * 12)).toFixed(2);
+            
+            document.getElementById("emiResult").innerHTML = `
+                <h3>EMI Results</h3>
+                <p>Monthly EMI: <span style="color:blue">₹${emi.toFixed(2)}</span></p>
+                <p>Total Interest: <span style="color:blue">₹${totalInterest.toFixed(2)}</span></p>
+				<p>Total Payble: <span style="color:blue">₹${(emi * months).toFixed(2)}</span></p>
+                <p>Time in which Interest would be payed: <span style="color:blue">${interestYears} years</span></p>
+            `;
+        }
+		
+		
+		function testRegex() {
+            const regexInput = document.getElementById('regexInput').value;
+            const textInput = document.getElementById('textInput').value;
+            const regexOutput = document.getElementById('regexOutput');
+
+            try {
+                const regex = new RegExp(regexInput, 'g');
+                const highlightedText = textInput.replace(regex, match => `<span class="highlight" style="background:#6ede80">${match}</span>`);
+                regexOutput.innerHTML = highlightedText;
+            } catch (e) {
+                showError('Error: Invalid regular expression.');
+            }
+        }
     </script>
 
     <!-- Add CryptoJS library for SHA256 -->
