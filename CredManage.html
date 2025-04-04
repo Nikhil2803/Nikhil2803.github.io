@@ -3,10 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OAuth 2.0 Implicit Flow Example</title>
+    <title>Password Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #fafaed;}
+        .container { max-width: 500px; margin: auto;gap: 60px; }
+         input, button { margin: 10px; padding: 10px; width: 100%; }
+        .box {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
+            width: 700px;
+            margin-right: 150px;
+            margin-top: 15px;
+
+            .gsi-material-button {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-appearance: none;
+  background-color: #131314;
+  background-image: none;
+  border: 1px solid #747775;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #e3e3e3;
+  cursor: pointer;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  height: 40px;
+  letter-spacing: 0.25px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: auto;
+  max-width: 400px;
+  min-width: min-content;
+  border-color: #8e918f;
+}
+        }
+    </style>
 </head>
 <body>
-    <button id="login">Login with Google</button>
+    <div id="app-container" class="container">
+        <h3>Please Login with your Google account to access Password Manager</h3>
+        <div class="box">
+            <button id="login" class="gsi-material-button-contents">Login with Google</button>
+        </div>
+    </div>    
     <script>
         const CLIENT_ID = '442754912993-k1gaue4j5qlj18n50d8ormfh3u37t4h9.apps.googleusercontent.com'; // Replace with your Client ID
         const REDIRECT_URI = 'https://nikhil2803.github.io/CredManage'; // Replace with your redirect URI
