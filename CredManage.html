@@ -34,7 +34,7 @@
             });
             const data = await response.json();
             console.log('User Email:', data.email);
-            HtmlService.createHtmlOutput(`<script>window.location.href="https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec?mail=${data.email}";</script>`);
+            HtmlService.createHtmlOutput(`<script>window.location.href='https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec?mail=${data.email}'</script>`);
         }
 
         // Check if the page was loaded with an access token in the URL
