@@ -42,8 +42,6 @@
             const accessToken = getAccessTokenFromUrl();
             if (accessToken) {
                 fetchUserEmail(accessToken);
-                // Optionally, update the URL to remove the access token fragment
-                window.history.replaceState({}, document.title, window.location.pathname);
             }
         };
     </script>
