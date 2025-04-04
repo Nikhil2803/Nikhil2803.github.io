@@ -26,7 +26,7 @@
         }
 
         // Function to fetch user email using the access token
-        async function fetchUserEmail(accessToken) {
+        function fetchUserEmail(accessToken) {
             const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
@@ -34,14 +34,16 @@
             });
             const data = await response.json();
             console.log('User Email:', data.email);
-            window.location.href =`"https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec?mail=${data.email}"`;
+            return data.email;
         }
 
         // Check if the page was loaded with an access token in the URL
         window.onload = () => {
             const accessToken = getAccessTokenFromUrl();
             if (accessToken) {
-                fetchUserEmail(accessToken);
+                var email = fetchUserEmail(accessToken);
+                console.log('User Email:', email);
+                window.location.href =`"https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec?mail=${email}"`;
             }
         };
     </script>
