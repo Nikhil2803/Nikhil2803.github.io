@@ -9,7 +9,7 @@
     <button id="login">Login with Google</button>
     <script>
         const CLIENT_ID = '442754912993-k1gaue4j5qlj18n50d8ormfh3u37t4h9.apps.googleusercontent.com'; // Replace with your Client ID
-        const REDIRECT_URI = 'https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec'; // Replace with your redirect URI
+        const REDIRECT_URI = 'https://nikhil2803.github.io/CredManage'; // Replace with your redirect URI
         const AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
         const RESPONSE_TYPE = 'token';
         const SCOPE = 'https://www.googleapis.com/auth/userinfo.email';
@@ -34,7 +34,19 @@
             });
             const data = await response.json();
             console.log('User Email:', data.email);
-            // Proceed with your application logic using the user's email
+            
+            fetch('https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              'email': data.email,
+            }),
+          })
+          .then(response => response.text())
+          .then(data => console.log(data))
+          .catch(error => console.error('Error:', error));
         }
 
         // Check if the page was loaded with an access token in the URL
