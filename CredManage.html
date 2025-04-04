@@ -2,9 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Your App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth 2.0 Implicit Flow Example</title>
 </head>
 <body>
-    <iframe src="https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec" style="border:none; width:100%; height:100vh;"></iframe>
+    <button id="login">Login with Google</button>
+    <script>
+        const CLIENT_ID = '442754912993-k1gaue4j5qlj18n50d8ormfh3u37t4h9.apps.googleusercontent.com'; // Replace with your Client ID
+        const REDIRECT_URI = 'https://script.google.com/macros/s/AKfycbzhrAU9vnLREZr7z_UHkPQEHIsYwnZydGCUu5rOVWc/exec'; // Replace with your redirect URI
+        const AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
+        const RESPONSE_TYPE = 'token';
+        const SCOPE = 'https://www.googleapis.com/auth/userinfo.email';
+
+        document.getElementById('login').addEventListener('click', () => {
+            const authUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=${RESPONSE_TYPE}&scope=${encodeURIComponent(SCOPE)}`;
+            window.location.href = authUrl;
+        });
+
+        // Function to parse the URL fragment and extract the access token
+        function getAccessTokenFromUrl() {
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            return params.get('access_token');
+        }
+
+        // Function to fetch user email using the access token
+        async function fetchUserEmail(accessToken) {
+            const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+            const data = await response.json();
+            console.log('User Email:', data.email);
+            // Proceed with your application logic using the user's email
+        }
+
+        // Check if the page was loaded with an access token in the URL
+        window.onload = () => {
+            const accessToken = getAccessTokenFromUrl();
+            if (accessToken) {
+                fetchUserEmail(accessToken);
+                // Optionally, update the URL to remove the access token fragment
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        };
+    </script>
 </body>
 </html>
